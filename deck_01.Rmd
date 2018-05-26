@@ -1,0 +1,609 @@
+
+---
+title: "Introduction to <grn>mrgsolve</grn><BR>Models and Events"
+author: Kyle T. Baron
+date: Metrum Research Group, LLC
+output: 
+  slidy_presentation:
+    number_sections: true
+    css: [src/styles/slidystyles.css,src/styles/colors.css]
+  html_document:
+    theme: united
+    number_sections: true
+    toc: true
+    css: [src/styles/htmlstyles.css,src/styles/colors.css]
+---
+
+
+
+```{r, include = FALSE}
+source("src/global.R")
+library(mrgsolve)
+library(dplyr)
+library(knitr)
+library(lattice)
+tryit_file <- "workbook.Rmd"
+```
+
+```{r setup, echo = FALSE, message = FALSE}
+mod <- mread_cache("pk1", modlib()) %>% 
+  update(end = 192, delta = 0.2) %>% Req(CP)
+data(exidata)
+data <- filter(exidata, ID <=10)
+set.seed(1222)
+```
+
+# A basic simulation with mrgsolve
+```{r}
+mod %>% ev(amt = 100, ii = 24, addl = 3) %>% mrgsim() %>% plot()
+```
+
+
+# A basic simulation with mrgsolve
+
+```{r, eval = FALSE}
+mod %>% ev(amt = 100, ii = 24, addl = 3) %>% mrgsim() %>% plot()
+```
+
+- <red>mod</red>: the model object
+    - Ok ... where did `that` come from?
+- <blu>ev(amt = 100, ...)</blu> : the intervention
+    - An `event` in this example
+- <grn>mrgsim()</grn>: actually do the simulation
+- <orng>plot()</orng>: do something with the simulation
+    - `plot`, `mutate`, `as_data_frame` etc ... 
+
+
+> - <red>model</red> `%>%` <blu>intervention</blu> `%>%` <grn>Go!</grn> `%>%` <orng>take-a-look</orng> 
+
+# What's coming ...
+
+> - `model %>% intervention %>%` <alrt>options</alrt> `%>% Go! %>% ...`
+
+> - `model %>% intervention %>%` <orng>population</orng> `%>% Go! %>% ...`
+
+> - `model %>%` <purp>data-set</purp> `%>% Go! %>% ...`
+
+> - where <purp>data-set</purp> = `intervention + population`
+
+> - For now, let's get this part down 
+
+> - <red>model</red> `%>%` <blu>intervention</blu> `%>%` <grn>Go!</grn> `%>%` <orng>take-a-look<orng> 
+
+
+# Why do we use `%>%` ?
+
+What happens first in this operation?
+
+```{r, eval = FALSE}
+mean(sqrt(seq(4)))
+```
+
+# Pipelines
+
+```{r, eval = FALSE}
+mean(sqrt(seq(4)))
+```
+
+```{r, eval = FALSE}
+4  %>% seq() %>% sqrt() %>% mean()
+```
+
+Better.
+
+```{r, eval = FALSE}
+4  %>% 
+  seq(.) %>% 
+  sqrt(.) %>% 
+  mean(., na.rm = TRUE)
+```
+
+```{r,eval = FALSE}
+mod %>% some_intervention() %>% simulate() %>% post_process()
+```
+
+
+# The model object
+
+<red>mod</red><blk>el</blk> `%>% ... `
+
+> - I (almost) always call the model object <red>mod</red> in the documention / examples
+
+> - All the information about the model we need to know to run the simulation
+
+> - <grn>Distinct</grn> from the intervention, the population, the summary
+
+> - But the model <orng>does</orng> know  about output time, random effects
+
+
+
+
+
+# Take a look: overview
+
+```{r, comment = ""}
+mod
+```
+
+# Take a look: parameters (<red>really important</red>)
+```{r, comment = ""}
+param(mod)
+```
+
+> - Parameters get a name
+> - Names and number of parameters gets fixed at compile time
+> - All parameters have a value
+> - Value can be modified after compile time
+
+# Take a look: compartments
+```{r, comment = ""}
+init(mod)
+```
+
+> - Every compartment gets a name
+> - Every compartment gets an initial condition
+
+# Where did <red>mod</red> come from?
+
+```{r,eval = FALSE}
+mod <- mread("simple", "model")
+```
+
+
+```{r, eval = FALSE}
+mod <- mread("<model-name>", "<project-directory>")
+```
+
+- By default mrgsolve looks for the code in the file
+    - <grn>model-name.cpp</grn> in
+    - <blu>project-directory</blu>
+
+- <red>mread demo</red>
+
+```{r, echo = FALSE}
+Sys.sleep(2)
+```
+
+
+# Read in a model object with caching
+
+First time to read
+```{r}
+mod <- mread_cache("simple", "model")
+```
+
+Next time to read
+
+```{r}
+mod <- mread_cache("simple", "model")
+```
+
+# Oops 
+```{r}
+mod <- try(mread("simple"))
+
+mod
+```
+
+
+# Internal model library
+
+Quiz:
+
+```{r, eval = FALSE}
+mod <- mread("<first-argument>", "<second-argument>")
+```
+
+# Internal model library
+
+Quiz:
+
+```{r, eval = FALSE}
+mod <- mread("<first-argument>", "<second-argument>")
+```
+
+```{r, eval = FALSE}
+mod <- mread("<first-argument>", modlib())
+```
+
+```{r}
+modlib()
+```
+
+
+# Internal model library
+```{r}
+mod <- mread("effect", modlib())
+```
+
+```{r}
+mod
+```
+
+
+# Inline model specification
+
+We <red>haven't covered</red> the specifics of coding a model yet
+
+```{r}
+code <- '
+$PARAM CL = 1, V = 20
+$PKMODEL cmt = "CENT"
+'
+```
+
+```{r, eval = FALSE}
+mod <- mcode("dont_do_this", code)
+```
+
+```{r, eval = FALSE}
+mod <- mcode_cache("seriously_dont", code)
+```
+
+> - <font class = "red">Question:</font>  Why is this a bad idea?
+
+
+# <red>Your turn</red>
+
+- File name: <grn>`r tryit_file`</grn>
+
+- Section name: <blu>Warm Up</blu>
+
+
+
+# Event objects
+
+- `model %>%` <red>intervention</red> `%>% Go! %>% take-a-look`
+
+- Event object  = quick / easy way to implement dose or other intervention
+
+
+```{r}
+e <- ev(amt = 100) 
+
+e
+```
+
+> - Defaults: `time`, `evid`, `cmt`
+
+# Three ways to invoke
+
+<blk>Inline</blk>
+
+```{r, eval = FALSE}
+mod %>% ev(amt = 100) %>% mrgsim()
+```
+
+<blk>Object via pipeline</blk>
+
+```{r, eval = FALSE}
+e <- ev(amt = 100)
+
+mod %>% ev(e) %>% mrgsim()
+```
+
+<blk>As argument</blk>
+
+```{r, eval = FALSE}
+mod %>% mrgsim(events = e)
+```
+
+
+# What to include in `ev(...)`
+
+- <grn>time</grn> event time
+- <grn>cmt</grn> Event compartment
+- <grn>amt</grn> Dose amount
+- <grn>ii</grn> Inter-dose interval
+- <grn>addl</grn> Additional doses to administer
+- <grn>rate</grn> Infusion rate
+- <grn>ss</grn> Set to 1 to advance to steady state
+- <grn>evid</grn> Event id
+- <grn>ID</grn> Subject ID (use multiple ids - ID=1:10)
+
+# Interventions and corresponding `evid`
+
+-  <grn>Bolus</grn> dosing (`evid` 1, with `rate`==0)
+-  Zero order <grn>infusion</grn> (`evid` 1, with `rate` > 0)
+-  <grn>Other</grn> type event (`evid` 2)
+    -  This also forces solver reset
+-  Compartment <grn>reset</grn> (`evid` 3)
+-  <grn>Reset</grn> and dose (`evid` 4)
+-  <grn>Replace</grn> the amount in a specific compartment (`evid` 8)
+
+# Create complex events - 1
+
+What's going to happen?
+
+```{r, eval = FALSE}
+e1 <- ev(amt = 200) 
+
+e2 <- ev(amt = 100, time = 24, ii = 24, addl = 4)
+
+c(e1, e2)
+```
+
+# Create complex events - 1
+
+What's going to happen?
+
+```{r, echo = FALSE}
+e1 <- ev(amt = 200) 
+e2 <- ev(amt = 100, time = 24, ii = 24, addl = 4)
+e <- c(e1,e2)
+mod %>% 
+  ev(e) %>% 
+  mrgsim(end = 96) %>% plot(CP~.)
+```
+
+
+
+# Create complex events - 1
+
+Combine two events
+
+```{r}
+e1 <- ev(amt = 200) 
+
+e2 <- ev(amt = 100, time = 24, ii = 24, addl = 4)
+
+c(e1, e2)
+```
+
+# Create complex events - 2
+
+What's going to happen?
+
+```{r, eval = FALSE}
+e1 <- ev(amt = 200, ii = 12, addl = 2) 
+
+e2 <- ev(amt = 100, ii = 24, addl = 4)
+
+seq(e1, e2)
+```
+
+# Create complex events - 2
+
+What's going to happen?
+
+```{r, echo = FALSE}
+e1 <- ev(amt = 200, ii = 12, addl = 2) 
+e2 <- ev(amt = 100, ii = 24, addl = 4)
+e <- seq(e1, e2)
+mrgsim(mod, events = e, end = 180) %>% plot(CP ~ .)
+```
+
+
+# Create complex events - 2
+
+Put two events in a sequence
+
+```{r}
+e1 <- ev(amt = 200, ii = 12, addl = 2) 
+
+e2 <- ev(amt = 100, ii = 24, addl = 4)
+
+seq(e1, e2)
+```
+
+
+# Create complex events - 3
+
+What is going to happen?
+
+```{r, eval = FALSE}
+e1 <- ev(amt = 200) 
+
+e2 <- ev(amt = 100, ii = 24, addl = 4)
+
+seq(e1, wait = 36, e2)
+```
+
+# Create complex events - 3
+
+What is going to happen?
+
+```{r, echo = FALSE}
+e1 <- ev(amt = 200) 
+e2 <- ev(amt = 100, ii = 24, addl = 4)
+e <- seq(e1, wait = 36, e2)
+mrgsim(mod, events = e, end = 180) %>% plot(CP ~ .)
+```
+
+# Create complex events - 3
+
+Wait before starting the next part of the regimen
+
+```{r}
+e1 <- ev(amt = 200) 
+
+e2 <- ev(amt = 100, ii = 24, addl = 4)
+
+seq(e1, wait = 36, e2)
+```
+
+
+# <red>Your turn</red>
+
+- File name: <grn>`r tryit_file`</grn>
+
+- Section name: <blu>Z-Pak</blu>
+
+
+# Event objects are just data frames
+
+```{r}
+as.data.frame(e1)
+```
+
+- We will use a <blk>data_set</blk> later on for populations
+
+- Event objects are convenient
+  - Constructor
+  - Operations
+
+# We're stil working on this setup
+
+<hr>
+
+<red>model</red> `%>%` <blu>intervention</blu> `%>%` <grn>Go!</grn> `%>%` <orng>take-a-look</orng> 
+
+<hr>
+
+<red>model</red>:
+
+- Load a model with `mread` or `mread_cache`
+- Use the internal library with `mread("<model-name>", modlib())`
+- Check model parameters with `param(mod)`
+- Check model initial conditions with `init(mod)`
+- View model code with `see(mod)`
+
+<blu>intervention</blu>:
+
+- `ev(...`): `amt`, `cmt`, `time`, `ii`, `addl`, `rate`
+- Different ways to combine event objects
+
+
+# Simulate
+
+<hr>
+
+`model %>% intervention %>%` <grn>Go!</grn>
+
+<hr>
+
+
+```{r}
+mod %>% ev(e) %>% mrgsim()
+```
+
+
+```{r, eval = FALSE}
+mrgsim(mod, events = e)
+```
+
+# Deal with output
+
+<hr>
+
+`model %>% intervention %>% Go! %>%` <orng>take-a-look</orng> 
+
+<hr>
+
+# Plot
+
+```{r}
+mod %>% ev(amt = 100) %>% mrgsim() %>% plot()
+```
+
+# Plot
+
+```{r}
+mod %>% ev(amt = 100) %>% mrgsim() %>% 
+  plot(CP + EFFECT~., col = "firebrick")
+```
+
+# Pipeline to dplyr functions
+
+```{r}
+mod %>% mrgsim() %>% mutate(arm = 1)
+```
+
+# What would you like to "fix" in this plot?
+```{r,echo= FALSE}
+mod <- update(mod, end = 18, delta = 6)
+```
+
+```{r}
+mod %>% ev(amt = 100) %>% mrgsim() %>% plot(CP~time)
+```
+
+# Simulation end time
+```{r}
+mod %>% ev(amt = 100) %>% mrgsim(end = 48) %>% plot(CP~time)
+```
+
+# Simulation time step
+```{r}
+mod %>% ev(amt = 100) %>% mrgsim(end = 48, delta = 0.1) %>% plot(CP~time)
+```
+
+
+# Simulation time grid
+
+-  To form a sequence of times
+    - <grn>start</grn> usually `0`
+    - <grn>end</grn> time of last observation
+    - <grn>delta</grn> <blk>output</blk> time step
+-  Additional times to simulate
+    - <purp>add</purp> ad-hoc numeric vector
+    
+```{r}
+stime(mod)
+```
+# Update
+
+On the fly
+
+```{r, eval = FALSE}
+mod %>% update(end = 72) %>% mrgsim()
+```
+
+Persistent 
+
+```{r, eval = FALSE}
+mod <- update(mod, end = 72)
+```
+
+mrgsim will call `update` for you (on the fly)
+```{r, eval = FALSE}
+mod %>% mrgsim(end = 72)
+```
+
+
+# What else can I update?
+* Time
+    - `start`, `end`, `delta`, `add`
+* Parameters and compartment initial values
+* Solver settings
+    * `atol`, `rtol`
+    * `hmax`, `maxsteps`, `mxhnil`, `ixpr`
+* `$OMEGA`, `$SIGMA`
+* `tscale` (rescale the output time)
+* `digits`
+
+```{r, eval = FALSE}
+mod %>% update(rtol = 1E-12) %>% ...
+```
+
+```{r, eval = FALSE}
+mod %>% mrgsim(rtol = 1E-12) %>% ...
+```
+
+# Controlling output - <grn>request</grn>
+
+```{r}
+mod %>% mrgsim() %>% head(n = 2)
+```
+
+```{r}
+mod %>% Req(CP) %>% mrgsim() %>% head(n = 2)
+```
+
+
+# Controlling output - <grn>obsonly</grn>
+```{r}
+mod %>% ev(amt=1) %>% mrgsim() %>% head(n = 2)
+```
+
+```{r}
+mod %>% ev(amt=1) %>% obsonly() %>% mrgsim() %>% head(n = 2)
+```
+
+
+# Next slide deck
+
+[Data Sets](deck_02.html)
+
+
+

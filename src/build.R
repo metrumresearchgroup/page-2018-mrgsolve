@@ -1,0 +1,10 @@
+source("src/global.R")
+library(rmarkdown)
+render("deck_00.Rmd", output_dir = "doc")
+render("deck_01.Rmd", output_dir = "doc")
+render("deck_02.Rmd", output_dir = "doc")
+render("deck_03.Rmd", output_dir = "doc")
+render("handson_epo_pts.Rmd", output_dir = "doc")
+render("handson_opg_answer.Rmd", output_dir = "doc")
+render("handson_meropenem_vpc.Rmd", output_dir = "doc")
+

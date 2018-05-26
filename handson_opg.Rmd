@@ -1,0 +1,275 @@
+---
+title: "Fc-OPG PK/PD in healthy post-menopausal women"
+author: ""
+date: ""
+output: 
+  html_document:
+    css: src/styles/styles.css
+    highlight: pygments
+    theme: flatly
+---
+
+<hr><div class = spacersm></div>
+
+```{r,echo=FALSE}
+source("src/global.R")
+```
+
+# Packages
+```{r}
+proj <- "models"
+library(mrgsolve)
+library(dplyr)
+library(magrittr)
+library(parallel)
+library(ggplot2)
+```
+
+<hr><div class = spacer></div>
+
+## Question
+- What is the mean change from baseline 14 days after 3 mg/kg SC dose?
+- What is the probability that mean CFB is greater than 40%?
+
+# Code the OPG model
+
+
+<hr><div class = spacer></div>
+# OPG model
+
+```{r load and checkout opg model}
+
+```
+
+Checkout the random effects structure
+```{r}
+
+```
+
+Collapse `$OMEGA` and `$SIGMA`
+```{r collapse_omega_sigma}
+
+```
+
+
+We can render this in to an `Rmarkdown` document
+```{r,eval=FALSE}
+
+```
+
+# Load the simulated posterior
+
+- `data/opgpost.RDS`
+- Sample 1000 sets
+
+```{r read opgpost file }
+#set.seed()
+post <- NULL
+```
+
+
+For most of our examples, we are taking output directly
+from a NONMEM run. This example is a little different:
+We have changed the column names from `THETA1`, `THETA2` 
+etc ... to `TVCL`, `TVVC` etc ...
+```{r,check out posterior}
+
+```
+
+
+When working with results out of NONMEM, it is common to get
+the `THETA` , `OMEGA` and `SIGMA` estimates all in a single 
+row in a data frame.  
+
+In order to get the information for `OMEGA` and `SIGMA` in to 
+the problem, we need to go into this data and 
+form matrices.
+
+There are two specialized functions to help with this:
+
+- `as_bmat` when the data is in block format
+- `as_dmat` when the data is in diagonal format
+
+```{r}
+omegas <- NULL
+sigmas <- NULL
+```
+
+
+Here is a simple dosing data set to simulate 100 patients with 
+3 mg/kg Fc-OPG SC x1
+```{r}
+sc3 <- NULL
+head(sc3)
+```
+
+
+We will get the observation design for the simulation 
+through a `tgrid` object
+
+Let's only get observations at baseline and at week-2
+
+```{r tgrid object}
+des <- numeric(0)
+stime(des)
+```
+
+
+When we do replicate simulation, it almost always pays off
+to construct a function that will carry out one
+replicate.
+
+
+Arguments to the function are
+
+- `i` the current simulation replicate
+- `data` the dosing data set
+- `des` the observation design
+
+Workflow
+- Update parameters, omega and sigma
+- Simulate from `data` using `des`
+  - Get observations only
+  - label the replicate number with `irep`
+  - Also capture `TVIC50`, `TVQ1`, and `TVVMAX`
+  
+Return
+ - A data frame
+ 
+```{r}
+sim <- function() {
+  
+}
+```
+
+
+Also note 
+
+- We update `param` with `ith` row from `post`
+- We update `OMEGA` and `SIGMA` from the `ith` position 
+in the appropriate list of matrices
+- We will capture the current 
+
+
+It is easy to test the function.  The 10th replicate will
+look like this
+```{r test the sim function}
+
+```
+
+
+
+Simulate reps
+
+- Simulate with `mclapply` with 8 cores
+- 1000 replicates
+- Return a single data frame
+- Rember to set a seed
+
+```{r, eval = FALSE}
+options(mc.cores=8)
+mcRNG()
+#set.seed()
+out <- NULL
+```
+
+
+
+Summarise
+
+- For each individual
+  - First, get the baseline `NTX`
+  - Then calculate `percent` CFB
+
+
+
+```{r}
+sum <- 
+  out %>%
+  group_by() %>%
+  mutate(BASE = NULL, dDV = NULL) %>%
+  ungroup
+```
+
+
+
+Filter down to week 2
+```{r}
+
+```
+
+
+Now, get the median change from baseline for each replicate
+```{r}
+summ <- NULL
+```
+
+
+<hr><div class = spacer></div>
+
+## From the abstract
+
+> Subsequent clinical trial simulations demonstrated that a single 3.0-mg/kg SC dose of Fc-OPG would be expected to produce, at 14 days post-dose, a median NTX percentage change from baseline of −45% (with a 95% prediction interval ranging from −34% to −60%)."
+
+```{r}
+ans <- NULL
+```
+
+Median week-2 change from baseline with 95% interval
+
+
+Probability that median cfb > 40%
+```{r}
+
+```
+
+
+
+Plot the distribution of the week-2 change from baseline
+```{r}
+
+```
+
+
+<hr><div class = spacer></div>
+
+# Sensitivity analysis
+
+We are already set up to do the sensitivity analysis
+
+- `TVIC50`, `TVQ1`, and `TVVMAX`
+
+```{r, eval = FALSE}
+par <- dplyr::distinct(out,irep,...)
+head(par)
+```
+
+Now join the parameters
+```{r, eval = FALSE}
+sens <- left_join(summ,par)
+head(sens)
+```
+
+`TVIC50`
+```{r, eval = FALSE}
+ggplot(sens, aes(TVIC50, med)) + 
+  geom_point(col="darkslateblue") + 
+  geom_smooth(method="loess",col="red",lwd=2)
+```
+
+`TVVMAX`
+```{r, eval = FALSE}
+ggplot(sens, aes(TVVMAX, med)) + 
+  geom_point(col="darkslateblue") +
+  geom_smooth(method="loess",col="red",lwd=2)
+```
+
+
+`TVQ`
+```{r, eval = FALSE}
+ggplot(sens, aes(TVQ1, med)) + 
+  geom_point(col="darkslateblue") +
+  geom_smooth(method="loess",col="red",lwd=2)
+
+```
+

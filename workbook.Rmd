@@ -1,0 +1,337 @@
+---
+title: "Vignette Title"
+output:
+  github_document: 
+    toc: true
+---
+
+```{r, setup, echo = FALSE, message = FALSE, warning = FALSE}
+library(mrgsolve)
+library(tidyverse)
+```
+
+# Problems
+
+## Warm-up 
+
+Choose a `PKPD` model from the internal model library (`?modlib_pkpd`)
+to explore
+
+- Check the parameter values (`param`)
+- Check the compartments and initial values (`init`)
+- Review the model code (`see)
+
+```{r, warm_up_example, eval = FALSE}
+mod <- mread_cache("", modlib())
+```
+
+Extra credit: can you match up the output what what is going 
+on in the code?
+
+```{r, eval = FALSE}
+mod %>% mrgsim()
+```
+
+## Meropenem PK
+
+- Load the `meropenem` model from the model directory
+- Simulate the following scenarios:
+    - 100 mg IV bolus q8h x 3
+    - 100 mg IV over 3 hours q8h x3
+    
+Look at the `CP` output
+
+```{r}
+
+```
+
+
+## Z-Pak
+
+You've been sick for the last two weeks and can't take it any more. Finally, 
+you decide to go to the doctor, who gives you a diagnosis of 
+walking pneumonia. When you get home with your azithromycin 
+prescription, you start wondering about the directions: take 
+500 mg as a single dose on Day 1, followed by 250 mg once daily 
+on Days 2 through 5.
+
+Explore this regimen using the following model:
+
+- Model name: `azithro`
+- Model location: `model`
+
+Simulate out to at least day 14 to see what is happening.
+
+```{r, z_pak_example, eval = FALSE}
+mod <- mread("", "") %>% zero_re
+
+```
+
+## Output
+
+Run the following code and check the output
+
+```{r, eval = FALSE}
+mod <- mread_cache("azithro", "model")
+
+out <- 
+  mod %>% 
+  ev(amt = 500) %>%
+  mrgsim(end = 24, delta = 4)
+
+
+out
+
+class(out)
+
+head(out)
+
+out$CP
+
+as.data.frame(out)
+
+as_data_frame(out)
+
+filter(out, time==12)
+
+mutate(out, success = TRUE) %>% class
+
+```
+
+## Secukinumab for psoriasis
+
+You are the pharmacometrician supporting secukinumab program for psoriasis, 
+and the team wants an update.  You start telling them about 
+this awesome indirect response model you developed for week-5 PASI scores. 
+It has log-normal IIV and combined additive / prortional error model.  Standard
+errors look good and the condition number was low.  The pred-corrected VPC 
+and NPDE plots showed showed nothing to worry about. 
+
+As you wrap up your report, you notice the blank stares coming back from the 
+faces of the team members. 
+
+The clin pharm lead breaks the uncomfortable slience: We're looking at 
+a 100 mg dose in the 5 week induction period. We'd like to push the dose
+higher, but also worried about candida infection.  If we increase to 125
+mg or 150 mg, are we likely to see lower PASI scores?  How close are
+we to reaching the maximum effect for end of induction?
+
+- Use the `secukinumab` PK/PD model
+- Dose once weekly for 5 weeks
+- Generate a plot of PASI as fraction of baseline after 5 weekly
+doses between 0 and 150 mg
+
+
+```{r}
+mod <- mread_cache("secukinumab", "model") %>% zero_re()
+
+see(mod)
+
+out <- mod %>% ev(amt = 25) %>% mrgsim(end = 35) 
+
+plot(out)
+
+tail(out)
+```
+
+
+## Statin/CsA DDI
+
+- Load the model `yoshikado`
+
+- Examine the the following drug-drug interaction
+  - pitavastatin 30 mg x1
+  - cyclosporine 2000 mg x1; wait 1 hr; then pitavastatin 30 mg x1
+- What parameters is the pitavastatin profile sensitive to?
+
+
+```{r}
+
+```
+
+
+## GCSF dosing
+
+- Simulate 2.5, 5, and 10 mcg/kg assuming 50, 70, 90 kg individual
+- Simulate 2.5, 5, and 10 mcg/kg assuming log(WT) ~ N(log(80),0.1)
+
+- Do daily SC dosing x 7d
+
+```{r}
+
+```
+
+
+## Sim EBE
+
+```{r}
+data <- read_table("data/patab", skip = 1)
+
+```
+
+
+# Answers
+
+## Warm-up
+
+```{r, warm_up_answer}
+mod <- mread_cache("irm4", modlib())
+
+param(mod)
+
+init(mod)
+
+see(mod)
+```
+
+```{r, eval = FALSE}
+mod %>% mrgsim()
+```
+
+## Meropenem PK
+
+```{r}
+mod <- mread_cache("meropenem", "model")
+
+mod %>% 
+  ev(amt = 100, ii = 8, addl = 2) %>% 
+  mrgsim() %>%
+  plot
+```
+
+```{r}
+mod <- mread_cache("meropenem", "model")
+
+mod %>% 
+  ev(amt = 100, ii = 8, rate = 100/3, addl = 2) %>% 
+  mrgsim() %>%
+  plot
+```
+
+
+
+## Z-Pak
+```{r, z_pak_answer}
+mod <- mread("azithro", "model") %>% zero_re
+
+param(mod)
+
+param(mod)$TVV1 + param(mod)$TVV2
+
+```
+
+Set up an dosing event
+```{r}
+load <- ev(amt = 500, ii = 24,  addl = 0)
+maint <- ev(amt = 250, ii = 24, addl = 3)
+dose <- seq(load, maint)
+
+mod %>% 
+  ev(dose) %>%
+  mrgsim (end = 24*21) %>% 
+  plot(CP + PER2 + PER3 ~time/24)
+```
+
+
+## Output
+
+
+```{r}
+mod <- mread_cache("azithro", "model")
+
+out <- 
+  mod %>% 
+  ev(amt = 500) %>%
+  mrgsim(end = 24, delta = 4)
+
+out
+
+class(out)
+
+head(out)
+
+out$CP
+
+as.data.frame(out)
+
+as_data_frame(out)
+
+filter(out, time==12)
+
+mutate(out, success = TRUE) %>% class
+
+```
+
+## Statin/CsA DDI
+
+```{r}
+mod <- mread_cache("yoshikado", "model", end = 14, delta = 0.1)
+
+e1 <- ev(amt = 2000, cmt  = 2)
+mod %>% ev(e) %>% mrgsim() %>% plot(CSA~.)
+
+e2 <- ev(amt = 30, time  = 1)
+mod %>% ev(e2) %>% mrgsim() %>% plot(CP~.)
+
+out1 <- mod %>% ev(e2) %>% mrgsim_df(delta = 0.1) %>% mutate(ddi = FALSE)
+out2 <- mod %>% ev(e1+e2) %>% mrgsim_df(delta = 0.1) %>% mutate(ddi = TRUE)
+
+out <- bind_rows(out1, out2)
+
+ggplot(out, aes(time, CP, col = ddi)) + geom_line(lwd = 1) + 
+  scale_y_continuous(trans = "log10", limits = c(0.1, 100), 
+                     breaks = 10^seq(-4,4)) + 
+  scale_color_brewer(palette = "Set1")
+
+
+out %>% group_by(ddi) %>% summarise(Cmax = max(CP))
+
+#out %>% group_by(ddi) %>% summarise(auc = PKPDmisc::auc_partial(time, CP))
+```
+
+
+## Sim EBE
+
+```{r, message = FALSE}
+
+patab <- read_table("data/meropenem/patab", skip = 1)
+
+patab <- distinct(patab, .keep_all = TRUE)
+
+head(patab)
+
+mod <- mread_cache("pk2", modlib())
+
+inventory(mod, patab)
+
+patab <- rename(patab, V3 = V2, V2 = V1)
+
+inventory(mod,patab)
+
+data <- read_csv("data/Simulated_DatasetMeropenem.csv", na = '.')
+
+head(data)
+
+data <- filter(data, EVID==1) %>% mutate(DUR = round(AMT/RATE,1), DOSE = AMT)
+
+data <- mutate(data, II = 8, ADDL = 11, CMT = "CENT")
+
+count(data,CMT,AMT,RATE,DUR)
+
+dosing <- left_join(data, patab, by = "ID")
+
+tg <- tgrid(0,24,0.25) + 3*24
+
+out <- 
+  mod %>% 
+  data_set(dosing) %>%
+  carry_out(DOSE,DUR) %>%
+  mrgsim(tgrid = tg, obsonly = TRUE) %>% 
+  as.data.frame
+
+ggplot(out, aes(TIME,CP, group = ID)) + 
+  facet_wrap(DUR~DOSE) + geom_line()
+```
+
+
+

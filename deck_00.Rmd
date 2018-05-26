@@ -1,0 +1,135 @@
+
+---
+title: "Introduction to <grn>mrgsolve</grn><BR>Welcome"
+author: Kyle T. Baron
+date: Metrum Research Group, LLC
+output: 
+  slidy_presentation:
+    number_sections: true
+    css: [src/styles/slidystyles.css,src/styles/colors.css]
+  html_document:
+    theme: united
+    number_sections: true
+    toc: true
+    css: [src/styles/htmlstyles.css,src/styles/colors.css]
+---
+
+
+
+```{r, include = FALSE}
+source("src/global.R")
+library(mrgsolve)
+library(dplyr)
+library(knitr)
+library(lattice)
+
+tryit_file <- "workbook.Rmd"
+```
+
+```{r setup, echo = FALSE, message = FALSE}
+mod <- mread_cache("pk1", modlib()) %>% 
+  update(end = 192, delta = 0.2) %>% Req(CP)
+data(exidata)
+data <- filter(exidata, ID <= 10)
+set.seed(1222)
+```
+
+
+---
+
+```{r, echo = FALSE}
+mod %>% ev(amt = 100) %>% mrgsim(end = 72) %>% plot()
+```
+
+---
+
+```{r, echo = FALSE}
+mod %>% ev(amt = 100, ii = 24, addl = 4) %>% mrgsim() %>% plot()
+```
+
+---
+
+```{r, echo = FALSE}
+mod <- mread_cache("popex", modlib()) %>% Req(DV)
+data <- expand.ev(amt = 300, ii = 24, addl = 4, ID = seq(20))
+mod %>% data_set(data) %>% mrgsim() %>% plot()
+```
+
+---
+
+```{r, echo = FALSE}
+hmod <- mrgsolve:::house() %>% Req(DV,RESP) %>% update(end = 244)
+hdat <- mutate(data, time = 24)
+mrgsim(hmod, data = hdat, omega = dmat(0.1,0.1,0.1,0.1)) %>% plot()
+```
+
+---
+
+```{r, echo = FALSE}
+idata <- data_frame(VC = c(20,60,180))
+hmod %>% mrgsim(idata = idata,  end = 24*28, delta = 0.1,
+                events = ev(amt = 100, ii = 24, addl = 28)) %>%
+  plot(DV~.)
+```
+
+
+---
+
+```{r, echo = FALSE}
+mod <- mread_cache("conway", "model")
+e <- ev(amt = 1, evid = 8, time = 180) + ev(amt = 0, evid = 8, time = 2.5*365)
+idata <- data_frame(L_0 = c(1,3,5,7,10))
+out <- mrgsim(mod, events = e, idata = idata, end = 6*365, delta = 1)
+out@data <- mutate(out@data, time = time - 180)
+plot(out, L+logV~(time/365), xlab = "Time (year)")
+```
+
+
+# About `mrgsolve` 
+
+- `R` package for simulation from ODE-based models
+    - Free, OpenSource, GitHub, CRAN
+- Language
+    - Models written in `C++` inside model specification format
+    - General purpose solver: `ODEPACK` / `DLSODA` (`FORTRAN`)
+    - Simulation workflow in `R`
+- Hierarchical (population) simulation
+    - `ID`, $\eta$, $\varepsilon$
+- Integrated PK functionaility
+    - Bolus, infusion, `F`, `ALAG`, `SS` etc, handled under the hood
+    - 1- and 2-cmt PK models in closed-form
+- Extensible using `R`, `C++`, `Rcpp`, `boost`, `RcppArmadillo`
+- `R` is it's natural habitat
+
+# `mrgsolve` started as `QSP` modeling tool
+- Motivation: large bone/mineral homeostatsis model (CaBone)
+- History using
+    - Berkeley Madonna
+    - WinBUGS
+    - NONMEM (attempted)
+- 2010: write `R` front end to `deSolve`
+- 2012: write `C++` interface to `DLSODA`
+- Develop dosing / event capability
+- More recently, expose functionality provided by
+    - `Rcpp` - vectors, matrices, functions, environments, random numbers 
+    - `boost` - numerical tools in `C++`
+    - users' own `C++` code (functions, data structures, classes)
+- Translator from `SBML` to `mrgsolve` using `R` bindings to `libSBML`   
+
+
+# Orientation
+
+- https://github.com/mrgsolve/learn
+
+- GitHub site: https://github.com/metrumresearchgroup/mrgsolve
+
+- mrgsolve website: https://mrgsolve.github.io
+
+- User Guide: https://mrgsolve.github.io/user_guide
+
+# Please download the zipped repo again
+
+- https://github.com/metrumresearchgroup/page-2018-mrgsolve
+
+
+

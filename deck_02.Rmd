@@ -1,0 +1,270 @@
+
+---
+title: Introduction to <grn>mrgsolve</grn><BR>Data Sets
+author: Kyle T. Baron
+date: Metrum Research Group, LLC
+output: 
+  slidy_presentation:
+    number_sections: true
+    css: [src/styles/slidystyles.css,src/styles/colors.css]
+  html_document:
+    theme: united
+    number_sections: true
+    toc: true
+    css: [src/styles/htmlstyles.css,src/styles/colors.css]
+
+---
+
+
+
+```{r, include = FALSE}
+source("src/global.R")
+library(mrgsolve)
+library(dplyr)
+library(knitr)
+library(lattice)
+```
+
+```{r setup, echo = FALSE, message = FALSE}
+mod <- mread_cache("pk1", modlib()) %>% 
+  update(end = 192, delta = 0.2) %>% Req(CP)
+data(exidata)
+data <- filter(exidata, ID <=10)
+set.seed(1222)
+```
+
+```{r, echo = FALSE}
+pop <- exidata
+.out <- 
+  mod %>% 
+  ev(amt = 100, ii = 24, addl = 3) %>% 
+  idata_set(pop, ID <=10) %>%
+  mrgsim()
+```
+
+# Add a population element to the simulation
+
+
+- <red>model</red> `%>%` <blu>intervention</blu> `%>%` <grn>Go!</grn> `%>%`  <purp>take-a-look</purp> 
+
+> - `model %>% intervention %>%` <orng>population</orng> `%>% Go! %>% take-a-look`
+
+
+# One population simulation with mrgsolve
+
+<pre>
+mod %>% 
+  ev(amt = 100, ii = 24, addl = 3) %>% 
+  <grn>idata_set(</grn><red>pop</red><grn>)</grn> %>%
+  mrgsim() %>% plot()
+</pre>
+
+```{r, echo = FALSE}
+plot(.out)
+```
+
+# `idata_set` takes in individual-level data
+
+- ID  - one per row
+- Typically parameters in columns
+
+```{r}
+head(pop, n = 3)
+
+length(unique(pop$ID))
+```
+
+- This tells mrgsolve to simulate `r length(unique(pop$ID))` units or individuals
+
+# <red>pop</red> and <purp>mod</purp> are connected via <blu>parameters</blu>
+
+```{r}
+head(pop, n = 3)
+```
+
+```{r}
+param(mod)
+```
+
+# What else can we do with `idata`?
+
+Batches of simulations or sensitivity analyses
+
+```{r}
+idata <- expand.idata(CL = seq(0.5, 1.5, 0.25))
+idata
+```
+
+
+# Note: this is the <grn>event</grn> `+` <blu>idata_set</blu> configuration
+
+
+```{r}
+mod %>% 
+  idata_set(idata) %>% 
+  ev(amt = 100, ii = 24, addl = 2) %>% 
+  mrgsim(end = 120) %>% plot(log(CP) ~ .)
+```
+
+
+# `data_set` is the dosing equivalent to `idata_set`
+
+
+```{r}
+data <- expand.ev(amt = c(100, 300, 1000), ii = 24, addl = 3)
+
+head(data)
+```
+
+# Note: this is `data_set` configuration
+
+```{r}
+mod %>% 
+  data_set(data) %>% 
+  mrgsim(end = 120) %>% plot(log(CP) ~ .)
+```
+
+
+
+# <grn>data_set</grn> can also carry parameters
+
+```{r}
+data <- expand.ev(amt = c(100,300,1000), 
+                  ii = 24, addl = 3, 
+                  CL = seq(0.5,1.5, 0.5)) 
+
+head(data)
+```
+
+---
+```{r}
+data <- mutate(data, dose = amt)
+
+mod %>% 
+  data_set(data) %>% 
+  mrgsim(carry.out = "dose", end = 120) %>% 
+  plot(log(CP)~time|factor(dose), group = ID, scales = "same")
+```
+
+
+# <blk>carry_out</blk> or <blk>carry.out</blk>
+
+Copy from the input data to the output data
+
+```{r}
+mod %>% carry_out(dose) %>% data_set(data, dose==300) %>% mrgsim()
+```
+
+
+# What <grn>data_set</grn> and <blu>ev</blu>
+
+```{r}
+head(data, n = 3)
+```
+
+```{r}
+ev(amt = 100, ii = 24, addl = 3)
+```
+
+# We have now seen 3 simulation setups
+
+> - `mod + ev = ?`
+> - `mod + idata_set + ev = ?`
+> - `mod + data_set = ?`
+
+# Wait a minute ...
+```{r}
+head(data)
+```
+
+# Generating data sets
+
+- `expand.ev`
+- `ev_rep`
+- `as_data_set`
+- `ev_assign`
+
+
+# `expand.ev`
+
+Like `expand.grid`
+
+```{r}
+expand.ev(ID = 1:2, amt = c(100,200))
+```
+
+
+# `ev_rep`
+
+```{r}
+e <- ev(amt = 100, ii = 12, addl = 14)
+ev_rep(e, id = seq(5))
+```
+
+```{r, eval = FALSE}
+e <- ev(amt = 100, ii = 12, addl = 14, ID = seq(5))
+```
+
+
+# `ev_rep`
+
+```{r}
+e <- seq(ev(amt = 100), wait = 36, ev(amt = 50, ii = 24, addl = 4))
+e
+```
+```{r}
+ev_rep(e, id = seq(2))
+```
+
+
+# `as_data_set`
+
+```{r}
+data <- as_data_set(
+  ev(amt = 100, ii = 12, addl = 19, ID = 1:2),
+  ev(amt = 200, ii = 24, addl = 9,  ID = 1:3), 
+  ev(amt = 150, ii = 24, addl = 9,  ID = 1:4)
+)
+```
+```{r, echo = FALSE}
+head(data, n = 10)
+```
+
+
+# Updating parameters 1
+
+```{r}
+param(mod)
+```
+
+```{r, eval = FALSE}
+mod <- param(mod, V = 30)
+```
+```{r, eval = FALSE}
+mod %>% param(V = 30) %>% mrgsim()
+```
+
+
+# Updating parameters 2
+
+
+```{r}
+idata <- expand.idata(CL = seq(0.5, 1.5, 0.25))
+head(idata)
+
+```
+
+Put the second row into the parameters
+```{r, eval = FALSE}
+mod <- param(mod, slice(idata,2))
+```
+
+# Updating parameters 3
+
+The update here happens as the simulation progresses
+
+```{r, eval = FALSE}
+mod %>% idata_set(idata) %>% mrgsim()
+```
+
+

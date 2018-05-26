@@ -1,0 +1,220 @@
+---
+title: "VPC - meropenem PK model"
+author: "Metrum Research Group, LLC"
+date: ""
+output: 
+  html_document:
+    css: src/styles/styles.css
+    highlight: pygments
+    theme: flatly
+---
+
+
+```{r}
+source("src/global.R")
+source("src/functions.R")
+library(dplyr)
+library(mrgsolve)
+library(readr)
+library(magrittr)
+library(ggplot2)
+library(parallel)
+```
+
+
+# Introduction
+
+- "Population Pharmacokinetic Analysis and Dosing Regimen Optimization of Meropenem in Adult Patients"
+    - Li et al. J Clin Pharmacol 2006
+- Meropenem is broad-spectrum carbapenem antibiotic
+    - Efficacy related to time above MIC
+- IV dosing every 8 hours by infusion or bolus
+    - bolus over 3 to 5 minutes
+    - infusion over 15 to 30 minutes
+- Authors are interested in seeing if a longer infusion duration 
+can increase time above MIC
+
+# Helper functions
+```{r}
+qt <- function(x,y) unname(quantile(x,prob=y/100))
+lo <- function(x) qt(x,5)
+hi <- function(x) qt(x,95)
+med <- function(x) qt(x,50)
+loci <- function(x) qt(x,2.5)
+hici <- function(x) qt(x,97.5)
+col1 <- "steelblue"
+col2 <- "firebrick"
+```
+
+# Read and fix up the data set
+```{r}
+data <- 
+  read_csv("data/Simulated_DatasetMeropenem.csv", na = '.')  %>% 
+  mutate(CMT=1, DUR = AMT/RATE)
+```
+
+
+
+Derive a column that describes the infusion duration for each subject
+```{r}
+data %<>% 
+  group_by(ID) %>% 
+  mutate(DUR = first(DUR[!is.na(AMT)])) %>% 
+  ungroup
+
+data %<>% mutate(DUR = round(DUR,1))
+```
+
+Look at distinct values of `CMT`, `EVID`, `DUR` in `data`
+
+```{r}
+count(data,CMT,EVID,DUR)
+```
+
+Derive two data frames
+
+- One with observations only
+- One with doses only
+
+```{r}
+obs <- filter(data, EVID==0)
+head(obs)
+dose <- filter(data, EVID==1)
+```
+
+
+Plot observed data
+```{r}
+ggplot(data=obs, aes(TIME,DV)) + 
+  geom_point() +
+  scale_y_continuous(trans = "log", breaks = logbr())
+```
+
+Plot observed data by `DUR`
+```{r}
+ggplot(data=obs, aes(TIME,DV)) + 
+  geom_point() +
+  scale_y_continuous(trans = "log", breaks = logbr()) +
+  facet_wrap(~DUR) + xlim(0,8)
+```
+
+# Load the meropenem model
+
+```{r}
+mod <- mread("meropenem", "model")
+see(mod)
+```
+
+This model looks a little different because we got it 
+off of DDMoRe model repository.
+
+
+# Set up a simulation time grid for the VPC
+
+We want 
+- Hourly observations from time of first dose to 8 hours
+- Observations every 0.1 hours between 0 and 3 hours 
+
+```{r}
+des1 <- tgrid(0,3.1,0.1)
+des2 <- tgrid(0,8,1)
+des <- c(des1,des2)
+des
+```
+
+
+A function to do the (replicate) simulation
+
+Arguments
+
+- `i` the replicate number
+
+Returns simulated data set 
+
+- time as in `des`
+- `DUR` the infusion duration 
+- `TIME > 0` and `Y > 0`
+- Labeled with replicate number
+
+```{r}
+simvpc <- function(i) {
+  mod %>% 
+    data_set(dose) %>%
+    carry_out(DUR) %>%
+    obsonly %>%
+    mrgsim(tgrid=des) %>% 
+    filter(TIME > 0 & Y > 0) %>%
+    mutate(irep = i)
+}
+```
+
+Simulate
+
+- 100 iterations
+- Use mclapply
+- Bind into a single data frame
+
+```{r}
+niter <- 100
+out <- mclapply(1:niter, mc.cores=8, simvpc) %>% bind_rows
+```
+
+
+# Summarize simulated data
+```{r}
+sum1 <- 
+  out %>% 
+  filter(Y > 0) %>%
+  group_by(DUR,irep,TIME) %>%
+  summarise(med=med(Y), lo=lo(Y), hi=hi(Y), N=n())
+```
+
+
+```{r}
+sum2 <- 
+  sum1 %>%
+  group_by(DUR,TIME) %>% 
+  summarise(medlo = loci(med), medmed = med(med), medhi = hici(med),
+            lolo =  loci(lo),  lomed  = med(lo),  lohi  = hici(lo),
+            hilo =  loci(hi),  himed  = med(hi),  hihi  = hici(hi))
+```
+
+```{r}
+p1 <- 
+  ggplot(data=sum2) + 
+  geom_ribbon(aes(TIME,ymin=medlo, ymax = medhi),alpha=0.3,fill=col1) + 
+  geom_ribbon(aes(TIME,ymin=lolo, ymax=lohi),alpha=0.3,fill=col1) + 
+  geom_ribbon(aes(TIME,ymin=hilo, ymax=hihi),alpha=0.3,fill=col1) + 
+  geom_point(data=obs, aes(TIME,DV),col=col2) +
+  geom_line(aes(TIME,y=medmed), lwd=1,col=col1) +
+  geom_line(aes(TIME,y=lomed), lwd=1,col=col1) +
+  geom_line(aes(TIME,y=himed), lwd=1,col=col1) +
+  scale_y_continuous(trans="log", breaks=10^seq(-5,5)) +
+  facet_wrap(~DUR)
+
+```
+
+
+```{r, fig.width=8}
+p1
+```
+
+  
+# Summarize observed data and add to plot
+```{r}
+obs1 <- 
+  obs %>% 
+  filter(DV > 0) %>%
+  group_by(DUR,TIME) %>%
+  summarise(med=med(DV), lo=lo(DV), hi=hi(DV), N=n())
+```
+
+```{r, fig.width=8}
+p1 + 
+  geom_line(data=obs1,aes(TIME,y=med),lty=2, lwd=1) +
+  geom_line(data=obs1,aes(TIME,y=lo), lty=2, lwd=1) +
+  geom_line(data=obs1,aes(TIME,y=hi), lty=2, lwd=1)
+```
+
+
+
