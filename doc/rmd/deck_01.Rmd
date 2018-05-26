@@ -3,17 +3,17 @@
 title: "Introduction to <grn>mrgsolve</grn><BR>Models and Events"
 author: Kyle T. Baron
 date: Metrum Research Group, LLC
+knit_root_dir: "../../"
 output: 
   slidy_presentation:
     number_sections: true
-    css: [src/styles/slidystyles.css,src/styles/colors.css]
+    css: [../../src/styles/slidystyles.css,../../src/styles/colors.css]
   html_document:
     theme: united
     number_sections: true
     toc: true
     css: [src/styles/htmlstyles.css,src/styles/colors.css]
 ---
-
 
 
 ```{r, include = FALSE}

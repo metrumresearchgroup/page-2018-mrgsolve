@@ -1,4 +1,4 @@
-.libPaths("/data/Rlibs")
+.libPaths("/data/page-Rlibs")
 knitr::opts_chunk$set(
   comment = '.', 
   fig.height = 5, 

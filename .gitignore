@@ -3,6 +3,7 @@
 .Rapp.history
 
 /*.html
+doc/deck/*.html
 
 # Session Data files
 .RData
