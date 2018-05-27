@@ -1,7 +1,7 @@
 author <- c("*")
 
 pkgs <- c("tidyverse", "mrgsolve", "knitr", "rmarkdown", "data.table", 
-          "caTools", "bitops", "formatR")
+          "caTools", "bitops", "formatR", "git2r")
 
 
 pkgRoot <- "/data/page-packages"
