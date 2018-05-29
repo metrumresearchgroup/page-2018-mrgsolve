@@ -24,7 +24,7 @@ library(knitr)
 library(lattice)
 ```
 
-```{r setup, echo = FALSE, message = FALSE}
+```{r setup-2, echo = FALSE, message = FALSE}
 mod <- mread_cache("pk1", modlib()) %>%
   update(end = 192, delta = 0.2) %>% Req(CP)
 data(exidata)

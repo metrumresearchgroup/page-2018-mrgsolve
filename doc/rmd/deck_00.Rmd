@@ -30,6 +30,65 @@ library(lattice)
 tryit_file <- "workbook.Rmd"
 ```
 
+# People
+- Michelle Johnson
+- Matthew Riggs
+- Kyle Baron
+- MetrumRG Staff
+
+# Cloud-based computer access via Metworx
+
+- Each participant may access an 8 core cloud instance 
+using Metworx
+- All software (R packages) needed for the workshop is pre-installed
+- We will use Rstudio and the R package mrgsolve for the course exercises
+- System requirements: Laptop with wifi and a browser can access
+Metworx at: https://metworx-eu-central-stage.metworx.com
+
+# Accessing Metworx
+
+- Sign in to Metworx
+    - <grn>url:</grn> https://metworx-eu-central-stage.metworx.com/
+    - <blu>username:</blu>
+    - <blu>password</blu>
+
+<hr>
+
+- Sign in to Rstudio
+    - Click on Rstudio
+    - <blu>username:</blu> 
+    - <blu>password:</blu>
+
+
+# Check out the repo
+
+```{r, eval = FALSE}
+username <- "mrgsolve-sp18"
+password <- "a45f7aa3d8f8fa53b25d2db780f6077ccba80925"
+
+#############################
+
+.libPaths("/data/page-Rlibs")
+
+if(!require("git2r")) install.packages("git2r")
+
+library(git2r)
+
+.repo_addr <- "https://github.com/metrumresearchgroup/page-2018-mrgsolve"
+.where <- "page-2018-mrgsolve-workshop"
+.branch <- "master"
+
+if(!file.exists(.where)) dir.create(.where)
+
+repo <- clone(
+  .repo_addr, 
+  branch=.branch,
+  credentials=cred_user_pass(username,password),
+  local_path=.where
+)
+```
+
+
 ```{r setup, echo = FALSE, message = FALSE}
 mod <- mread_cache("pk1", modlib()) %>% 
   update(end = 192, delta = 0.2) %>% Req(CP)
@@ -123,7 +182,7 @@ plot(out, L+logV~(time/365), xlab = "Time (year)")
 
 # Orientation
 
-- https://github.com/mrgsolve/learn
+- https://CRAN.R-project.org/package=mrgsolve
 
 - GitHub site: https://github.com/metrumresearchgroup/mrgsolve
 
@@ -131,9 +190,8 @@ plot(out, L+logV~(time/365), xlab = "Time (year)")
 
 - User Guide: https://mrgsolve.github.io/user_guide
 
-# Please download the zipped repo again
+- Something I'm working on (YMMV): https://kylebmetrum.github.io/mrgsolve-intro
 
-- https://github.com/metrumresearchgroup/page-2018-mrgsolve
 
 
 

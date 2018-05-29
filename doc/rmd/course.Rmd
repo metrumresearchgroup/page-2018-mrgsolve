@@ -1,0 +1,29 @@
+
+---
+title: "Introduction to <grn>mrgsolve</grn>"
+author: PAGE 2018 Workshop
+date: Metrum Research Group, LLC
+knit_root_dir: "../../"
+output: 
+  slidy_presentation:
+    number_sections: true
+    css: [../../src/styles/slidystyles.css,../../src/styles/colors.css]
+  html_document:
+    theme: united
+    number_sections: true
+    toc: true
+    css: [src/styles/htmlstyles.css,src/styles/colors.css]
+---
+
+
+```{r, child = "deck_00.Rmd"}
+```
+```{r, child = "deck_01.Rmd"}
+```
+```{r, child = "deck_02.Rmd"}
+```
+```{r, child = "deck_03.Rmd"}
+```
+
+
+

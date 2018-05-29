@@ -7,5 +7,8 @@ render("doc/rmd/deck_03.Rmd", output_dir = "doc")
 render("handson_epo_pts.Rmd", output_dir = "doc")
 render("handson_opg_answer.Rmd", output_dir = "doc")
 render("handson_meropenem_vpc.Rmd", output_dir = "doc")
+render("handson_sim_ebe.Rmd", output_dir = "doc")
+render("handson_specification.Rmd", output_dir = "doc")
 
-render_site("doc/rmd")
+
+
