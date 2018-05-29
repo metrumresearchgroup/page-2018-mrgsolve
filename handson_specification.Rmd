@@ -1,0 +1,65 @@
+---
+title: "Model Specification"
+author: "Metrum Research Group, LLC"
+date: ""
+output: 
+  html_document:
+    css: src/styles/styles.css
+    highlight: pygments
+    theme: flatly
+---
+
+
+
+# PK analytical solution
+
+- One-compartment PK model, with first-order absorption
+  - Parameters
+    - Clearance
+    - Volume
+    - Absorption rate constant
+  - Compartments
+    - Depot or absorption compartment
+    - Central compartment
+- Output: concentration in the central compartment
+
+
+# PK with odes
+
+- Same model, but implemented with ODE
+
+# Add a covariate
+
+- Make CL a function of WT
+- Make volume a function of categorical covariate
+
+# Add subject-level random effects 
+
+- Put IIV on CL and V
+- What about IOV?
+
+# Add a residual error model
+
+- Exponential error
+- Make a function of covariate
+
+
+# Add a PD model
+
+- Some sort of IRM perhaps?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

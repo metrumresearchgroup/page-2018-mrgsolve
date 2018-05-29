@@ -242,13 +242,11 @@ mod <- mcode_cache("seriously_dont", code)
 
 > - <font class = "red">Question:</font>  Why is this a bad idea?
 
-
 # <red>Your turn</red>
 
 - File name: <grn>`r tryit_file`</grn>
 
 - Section name: <blu>Warm Up</blu>
-
 
 
 # Event objects
@@ -422,6 +420,65 @@ e2 <- ev(amt = 100, ii = 24, addl = 4)
 seq(e1, wait = 36, e2)
 ```
 
+# Simulate
+
+```{r, echo = FALSE, message = FALSE}
+mod <- mread_cache("effect", modlib())
+```
+
+
+<hr>
+
+`model %>% intervention %>%` <grn>Go!</grn>
+
+<hr>
+
+
+
+```{r}
+e <- ev(amt = 100)
+
+mod %>% ev(e) %>% mrgsim()
+```
+
+
+```{r, eval = FALSE}
+mrgsim(mod, events = e)
+```
+
+# What would you like to "fix" in this plot?
+```{r,echo= FALSE}
+mod <- update(mod, end = 18, delta = 6)
+```
+
+```{r}
+mod %>% ev(amt = 100) %>% mrgsim() %>% plot(CP~time)
+```
+
+# Simulation end time
+```{r}
+mod %>% ev(amt = 100) %>% mrgsim(end = 48) %>% plot(CP~time)
+```
+
+# Simulation time step
+```{r}
+mod %>% ev(amt = 100) %>% mrgsim(end = 48, delta = 0.1) %>% plot(CP~time)
+```
+
+
+# Simulation time grid
+
+-  To form a sequence of times
+    - <grn>start</grn> usually `0`
+    - <grn>end</grn> time of last observation
+    - <grn>delta</grn> <blk>output</blk> time step
+-  Additional times to simulate
+    - <purp>add</purp> ad-hoc numeric vector
+    
+```{r}
+stime(mod)
+```
+
 
 # <red>Your turn</red>
 
@@ -464,25 +521,8 @@ as.data.frame(e1)
 - Different ways to combine event objects
 
 
-# Simulate
 
-<hr>
-
-`model %>% intervention %>%` <grn>Go!</grn>
-
-<hr>
-
-
-```{r}
-mod %>% ev(e) %>% mrgsim()
-```
-
-
-```{r, eval = FALSE}
-mrgsim(mod, events = e)
-```
-
-# Deal with output
+# Working with simulated output
 
 <hr>
 
@@ -493,6 +533,8 @@ mrgsim(mod, events = e)
 # Plot
 
 ```{r}
+mod <- mread_cache("effect", modlib())
+
 mod %>% ev(amt = 100) %>% mrgsim() %>% plot()
 ```
 
@@ -509,38 +551,7 @@ mod %>% ev(amt = 100) %>% mrgsim() %>%
 mod %>% mrgsim() %>% mutate(arm = 1)
 ```
 
-# What would you like to "fix" in this plot?
-```{r,echo= FALSE}
-mod <- update(mod, end = 18, delta = 6)
-```
 
-```{r}
-mod %>% ev(amt = 100) %>% mrgsim() %>% plot(CP~time)
-```
-
-# Simulation end time
-```{r}
-mod %>% ev(amt = 100) %>% mrgsim(end = 48) %>% plot(CP~time)
-```
-
-# Simulation time step
-```{r}
-mod %>% ev(amt = 100) %>% mrgsim(end = 48, delta = 0.1) %>% plot(CP~time)
-```
-
-
-# Simulation time grid
-
--  To form a sequence of times
-    - <grn>start</grn> usually `0`
-    - <grn>end</grn> time of last observation
-    - <grn>delta</grn> <blk>output</blk> time step
--  Additional times to simulate
-    - <purp>add</purp> ad-hoc numeric vector
-    
-```{r}
-stime(mod)
-```
 # Update
 
 On the fly
@@ -580,6 +591,7 @@ mod %>% update(rtol = 1E-12) %>% ...
 mod %>% mrgsim(rtol = 1E-12) %>% ...
 ```
 
+
 # Controlling output - <grn>request</grn>
 
 ```{r}
@@ -600,10 +612,6 @@ mod %>% ev(amt=1) %>% mrgsim() %>% head(n = 2)
 mod %>% ev(amt=1) %>% obsonly() %>% mrgsim() %>% head(n = 2)
 ```
 
-
-# Next slide deck
-
-[Data Sets](deck_02.html)
 
 
 

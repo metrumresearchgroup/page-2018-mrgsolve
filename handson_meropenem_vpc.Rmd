@@ -24,7 +24,8 @@ library(parallel)
 
 # Introduction
 
-- "Population Pharmacokinetic Analysis and Dosing Regimen Optimization of Meropenem in Adult Patients"
+- "Population Pharmacokinetic Analysis and Dosing Regimen Optimization of 
+  Meropenem in Adult Patients"
     - Li et al. J Clin Pharmacol 2006
 - Meropenem is broad-spectrum carbapenem antibiotic
     - Efficacy related to time above MIC
@@ -32,7 +33,7 @@ library(parallel)
     - bolus over 3 to 5 minutes
     - infusion over 15 to 30 minutes
 - Authors are interested in seeing if a longer infusion duration 
-can increase time above MIC
+  can increase time above MIC
 
 # Helper functions
 ```{r}
@@ -62,7 +63,7 @@ data %<>%
   mutate(DUR = first(DUR[!is.na(AMT)])) %>% 
   ungroup
 
-data %<>% mutate(DUR = round(DUR,1))
+data <- data %>% mutate(DUR = round(DUR,1))
 ```
 
 Look at distinct values of `CMT`, `EVID`, `DUR` in `data`

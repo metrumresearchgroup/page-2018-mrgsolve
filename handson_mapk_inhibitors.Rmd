@@ -105,65 +105,6 @@ mod %>%
   plot(ERKi+TUMOR ~ time)
 ```
 
-## Sensitivity analysis
-
-
-The authors note two parameters that are particularly influential with 
-respect to response rates:
-
-- wOR: MAPK pathway dependence parameter
-- $\delta_{max}$: the maximum cell death rate
-
-
-```{r}
-vp %>% select(wOR,dmax) %>%
-  map(quantile, probs = seq(0,1,0.1)) %>% 
-  bind_cols() %>% mutate(pctile = seq(0,1,0.1))
-```
-
-
-__Sensitivity analysis on MAPK pathway dependence__
-
-- Given the other parameters for this virtual patient, whenever 
-wOR falls below 90% or so, you get no change in tumor size
-
-- The authors discuss the possibility of looking for biomarkers that would 
-indicate a patient is showing high dependence on MAPK signalling to improve
-response rates
-
-```{r}
-library(mrgsolvetk)
-
-ev400 <- filter(e, amt==400) %>% select(-ID) %>% as.ev()
-
-mod %>% 
-  ev(ev400) %>% Req(TUMOR) %>%
-  sens_range(wOR = c(0.9,1), .n = 8) %>%
-  mutate(value = signif(value,3)) %>%
-  ggplot(aes(time, TUMOR, col = factor(value), group = value)) + 
-  geom_line(lwd = 1) + geom_hline(yintercept = 1, lty = 2) + theme_bw()
-```
-
-
-__Sensitivity analysis on $\delta_{max}$__
-
-- In this analysis, we look between 0.2 and 2 times the nominal 
-parameter value for this virtual patient
-
-- The authors do a simulation with a hypothetical agent that increases the 
-cell death rate by 10%
-
-```{r}
-mod %>% 
-  ev(ev400) %>% Req(TUMOR) %>%
-  select(dmax) %>% 
-  sens_range(.factor = c(0.2, 2), .n = 8) %>%
-  mutate(value = signif(value,3)) %>%
-  ggplot(aes(time, TUMOR, col = factor(value), group = value)) + 
-  geom_line(lwd = 1) + geom_hline(yintercept = 1, lty = 2) + theme_bw()
-```
-
-
 
 
 # Predicting clinical outcomes for combination therapies

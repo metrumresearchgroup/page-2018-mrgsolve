@@ -1,7 +1,7 @@
 
 ---
-title: "Introduction to <grn>mrgsolve</grn><BR>Welcome"
-author: Kyle T. Baron
+title: "Introduction to <grn>mrgsolve</grn>"
+author: PAGE 2018 Workshop
 date: Metrum Research Group, LLC
 knit_root_dir: "../../"
 output: 
@@ -15,6 +15,9 @@ output:
     css: [src/styles/htmlstyles.css,src/styles/colors.css]
 ---
 
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(message = FALSE, cache.path="cache/deck_00/")
+```
 
 
 ```{r, include = FALSE}
