@@ -1,7 +1,7 @@
 
 ---
 title: "Introduction to <grn>mrgsolve</grn><BR>Models and Events"
-author: Kyle T. Baron
+author: PAGE 2018 Workshop
 date: Metrum Research Group, LLC
 knit_root_dir: "../../"
 output: 
@@ -244,7 +244,7 @@ mod <- mcode_cache("seriously_dont", code)
 
 # <red>Your turn</red>
 
-- File name: <grn>`r tryit_file`</grn>
+- File name: <grn>exercises/warm_up.R</grn>
 
 - Section name: <blu>Warm Up</blu>
 
@@ -482,7 +482,7 @@ stime(mod)
 
 # <red>Your turn</red>
 
-- File name: <grn>`r tryit_file`</grn>
+- File name: <grn>exercises/z-pak.R</grn>
 
 - Section name: <blu>Z-Pak</blu>
 
@@ -589,6 +589,14 @@ mod %>% update(rtol = 1E-12) %>% ...
 
 ```{r, eval = FALSE}
 mod %>% mrgsim(rtol = 1E-12) %>% ...
+```
+
+# Updating parameters
+
+- Demo
+
+```{r,eval = FALSE}
+mod <- param(mod, CL = 1.5)
 ```
 
 

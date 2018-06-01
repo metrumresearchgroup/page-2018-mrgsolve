@@ -5,7 +5,7 @@ library(mrgsolve)
 rm(list = ls())
 
 ##' Choose a `PKPD` model from the internal model library (`?modlib_pkpd`)
-##'to explore
+##' to explore
 
 ##' - Check the parameter values (`param`)
 ##' - Check the compartments and initial values (`init`)
@@ -13,9 +13,6 @@ rm(list = ls())
 
 mod <- mread_cache()
 
-##' Extra credit: can you match up the output what what is going 
-##' on in the code?
 
-mod %>% mrgsim()
 
 

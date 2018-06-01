@@ -10,7 +10,7 @@ output:
 ---
 
 
-```{r}
+```{r, message = FALSE}
 source("src/global.R")
 source("src/functions.R")
 library(dplyr)

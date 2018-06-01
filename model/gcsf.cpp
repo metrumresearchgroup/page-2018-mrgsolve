@@ -1,6 +1,13 @@
 [PROB]
 https://www.ncbi.nlm.nih.gov/pubmed/20881223
 
+1: Krzyzanski W, Wiczling P, Lowe P, Pigeolet E, Fink M, Berghout A, Balser S.
+Population modeling of filgrastim PK-PD in healthy adults following intravenous
+and subcutaneous administrations. J Clin Pharmacol. 
+2010 Sep;50(9 Suppl):101S-112S. doi: 10.1177/0091270010376966. 
+PubMed PMID: 20881223.
+
+
 PKPD NEUPOGEN BASELINE(BAS) at 0.0246 ng/ml
 
 [SET] end=120, delta=0.1
@@ -140,11 +147,7 @@ dxdt_B9   =  KTT * H2 * B8 - KBB1 * H3 * B9 - KTT * H2 * B9;
 dxdt_NB   =  KTT * H2 * B9 + KBB1 * H3 *(B1+B2+B3+B4+B5+B6+B7+B8+B9)-KMT*NB;
 
 [TABLE]
-  // ZNB   = A(14)
-  // ZNT=A(5)+A(6)+A(7)+A(8)+A(9)+A(10)+A(11)+A(12)+A(13)+A(14)
-  // RRTOT    = KSI*ZNT
-  // BBB=RRTOT-A(2)/VD+KD
-  // ZCP=0.5*(-BBB+SQRT(BBB**2+4*KD*A(2)/VD))
+
 //;----------SOLUTIONS:
 double ZNB   = NB;
 double ZNT   = B1+B2+B3+B4+B5+B6+B7+B8+B9+NB;
@@ -160,7 +163,6 @@ if(self.cmt==2) DV = CP;
 if(self.cmt==4) DV = RESP;
 
 [CAPTURE] CP
-
 
 [OMEGA]
 2.98E-01

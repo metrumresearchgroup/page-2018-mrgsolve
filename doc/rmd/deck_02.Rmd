@@ -1,18 +1,18 @@
 
 ---
 title: Introduction to <grn>mrgsolve</grn><BR>Data Sets
-author: Kyle T. Baron
+author: PAGE 2018 Workshop
 date: Metrum Research Group, LLC
 knit_root_dir: "../../"
 output:
-  slidy_presentation:
-    number_sections: true
-    css: [../../src/styles/slidystyles.css,../../src/styles/colors.css]
-  html_document:
-    theme: united
-    number_sections: true
-    toc: true
-    css: [src/styles/htmlstyles.css,src/styles/colors.css]
+slidy_presentation:
+number_sections: true
+css: [../../src/styles/slidystyles.css,../../src/styles/colors.css]
+html_document:
+theme: united
+number_sections: true
+toc: true
+css: [src/styles/htmlstyles.css,src/styles/colors.css]
 ---
 
 
@@ -53,9 +53,9 @@ pop <- exidata
 
 <pre>
 mod %>%
-  ev(amt = 100, ii = 24, addl = 3) %>%
-  <grn>idata_set(</grn><red>pop</red><grn>)</grn> %>%
-  mrgsim() %>% plot()
+ev(amt = 100, ii = 24, addl = 3) %>%
+<grn>idata_set(</grn><red>pop</red><grn>)</grn> %>%
+mrgsim() %>% plot()
 </pre>
 
 ```{r, echo = FALSE}
@@ -105,6 +105,12 @@ mod %>%
   mrgsim(end = 120) %>% plot(log(CP) ~ .)
 ```
 
+# <red>Your turn</red>
+
+- Description: sensitivity analysis in a PBPK model
+
+- File name: <grn>exercises/sensi_pbpk.R</grn>
+
 
 # `data_set` is the dosing equivalent to `idata_set`
 
@@ -128,9 +134,11 @@ mod %>%
 # <grn>data_set</grn> can also carry parameters
 
 ```{r}
-data <- expand.ev(amt = c(100,300,1000),
-                  ii = 24, addl = 3,
-                  CL = seq(0.5,1.5, 0.5))
+data <- expand.ev(
+  amt = c(100,300,1000),
+  ii = 24, addl = 3,
+  CL = seq(0.5,1.5, 0.5)
+)
 
 head(data)
 ```
@@ -219,7 +227,7 @@ e <- seq(ev(amt = 100), wait = 36, ev(amt = 50, ii = 24, addl = 4))
 e
 ```
 ```{r}
-ev_rep(e, id = seq(2))
+ev_rep(e, ID = seq(2))
 ```
 
 
@@ -262,14 +270,21 @@ head(data)
 # <red>Your turn</red>
 
 - Description: simulate GCSF PK/PD profiles for weight-based
-  dosing
+dosing
 
 - File name: <grn>exercises/gcsf.R</grn>
 
 # <red>Your turn</red>
 
+- Description: Population PK of azithromycin
+
+- File name: <grn>exercises/population_azithromycin.R</grn>
+
+
+# <red>Your turn</red>
+
 - Description: simulate PK profiles using empirical Bayes estimates 
-  from a meropenem model fit in NONMEM
+from a meropenem model fit in NONMEM
 
 - File name: <grn>exercises/sim_ebe.R</grn>
 

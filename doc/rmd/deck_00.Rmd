@@ -42,23 +42,24 @@ tryit_file <- "workbook.Rmd"
 using Metworx
 - All software (R packages) needed for the workshop is pre-installed
 - We will use Rstudio and the R package mrgsolve for the course exercises
-- System requirements: Laptop with wifi and a browser can access
-Metworx at: https://metworx-eu-central-stage.metworx.com
+- System requirements: Laptop with wifi and a browser 
 
 # Accessing Metworx
 
+<h3><grn>https://metworx-eu-central-stage.metworx.com</grn></h3>
+
+<h3>
 - Sign in to Metworx
-    - <grn>url:</grn> https://metworx-eu-central-stage.metworx.com/
-    - <blu>username:</blu>
-    - <blu>password</blu>
+    - <blu>username:</blu> page2018-<red>n</red>@metrumrg.com
+    - <blu>password</blu> PageConf2018!
 
 <hr>
 
 - Sign in to Rstudio
     - Click on Rstudio
-    - <blu>username:</blu> 
-    - <blu>password:</blu>
-
+    - <blu>username:</blu> page2018
+    - <blu>password:</blu> PageConf2018!
+</h3>
 
 # Check out the repo
 
@@ -96,6 +97,39 @@ data(exidata)
 data <- filter(exidata, ID <= 10)
 set.seed(1222)
 ```
+
+# Why “Open Science”?
+
+- What is this concept of “open” ?
+- How & why is it beneficial to the growth of our community 
+- Examples:
+    - open-source software: SBML, mrgsolve, Shiny etc., STAN/Torsten(?)
+    - open model repositories: Biomodels, github, DDmore. . .
+    - Publications, presentations, regulatory docs:
+        - good (model is described with parameter estimates),
+        - better (model mathematics provided with parameter estimates),
+        - best (executable code)
+    - PKsim / MOBI
+    - Osmosis Foundation
+
+# How we implement our science
+
+- Overview of Metworx system
+    - why share when you don’t have to (Performance),
+    - how to easily share when you want to (Envision)
+
+# Ideal computing
+
+<img src = "../../src/images/cloud.pdf" width = 800px></img>
+
+# What we might want
+
+<img src = "../../src/images/shinyPic.pdf" width = 800px></img>
+
+# Our workflow (Metworx)
+
+<img src = "../../src/images/metworxFlow.pdf" width = 800px></img>
+
 
 
 ---
@@ -190,8 +224,15 @@ plot(out, L+logV~(time/365), xlab = "Time (year)")
 
 - User Guide: https://mrgsolve.github.io/user_guide
 
-- Something I'm working on (YMMV): https://kylebmetrum.github.io/mrgsolve-intro
+# What we will cover today
 
+1. Three basic workflows
+1. Loading the model into R
+1. Event objects
+1. Data sets
+1. Model specification - code together
+1. This and that
+1. Applied examples
+1. Whatever you ask about
 
-
-
+<h3><grn>Emphasis is on getting you running your own simulations today.</grn></h3>
