@@ -31,10 +31,13 @@ tryit_file <- "workbook.Rmd"
 ```
 
 # People
+
 - Michelle Johnson
 - Matthew Riggs
-- Kyle Baron
-- MetrumRG Staff
+- Bill Knebel
+
+> - Kyle Baron
+> - The  participants ... thank you for coming!
 
 # Cloud-based computer access via Metworx
 
