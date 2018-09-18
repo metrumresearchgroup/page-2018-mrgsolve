@@ -32,6 +32,6 @@ Or click the green "Clone or download" button and select "Download Zip"
 
 The morning session was captured on video and is accesible [on YouTube](https://www.youtube.com/watch?v=gXEOAGDBwRU&list=PLvLDbH2lpyXP6xQySmi-_SFHu6qoY9Z61).  
 
-You can find other videos that introduce mrgsolve on [this youtube playlist](https://www.youtube.com/watch?v=XJs0KDfX834&list=PLvLDbH2lpyXOExve0kqu00-iCt1jbxq0L).
+You can find other videos that introduce mrgsolve on [this YouTube playlist](https://www.youtube.com/watch?v=XJs0KDfX834&list=PLvLDbH2lpyXOExve0kqu00-iCt1jbxq0L).
 
 
